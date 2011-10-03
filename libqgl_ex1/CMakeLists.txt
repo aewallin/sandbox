@@ -1,4 +1,4 @@
-project(libwgl_example1)
+project(libqgl_example1)
 
 cmake_minimum_required(VERSION 2.4)
 
