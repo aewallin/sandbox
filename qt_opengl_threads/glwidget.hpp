@@ -1,9 +1,6 @@
 
-
-
 #ifndef GLWIDGET
 #define GLWIDGET
-
 
 #include <QObject>
 #include <QThread>
@@ -11,7 +8,6 @@
 #include <QResizeEvent>
 
 #include "glthread.hpp"
-
 
 class GLWidget : public QGLWidget {
     Q_OBJECT
@@ -21,7 +17,6 @@ public:
         setAutoBufferSwap(false);
         resize(320, 240);
     }
-    
     void startRendering(){
          glt.start();
     }
@@ -29,7 +24,6 @@ public:
         glt.stop();
         glt.wait();
     }
-    
 protected:
     void resizeEvent(QResizeEvent *evt){
         glt.resizeViewport(evt->size());
@@ -41,9 +35,7 @@ protected:
         stopRendering();
         QGLWidget::closeEvent(evt);
     }
-
     GLThread glt;
 };
-
 
 #endif

@@ -1,14 +1,10 @@
 
-
 #ifndef GLTHREAD
 #define GLTHREAD
-
 
 #include <QObject>
 #include <QThread>
 #include <QSize>
-
-//#include "glwidget.hpp"
 
 class GLWidget;
 

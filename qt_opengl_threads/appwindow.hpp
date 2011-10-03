@@ -1,9 +1,6 @@
 
-
-
 #ifndef APPWINDOW
 #define APPWINDOW
-
 
 #include <QObject>
 #include <QThread>
@@ -11,7 +8,6 @@
 #include <QWorkspace>
 #include <QMainWindow>
 #include <QMenuBar>
-//#include <QPopupMenu>
 
 #include "glthread.hpp"
 #include "glwidget.hpp"
