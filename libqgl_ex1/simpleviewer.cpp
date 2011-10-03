@@ -31,7 +31,6 @@ void Viewer::init()
 {
   // Restore previous viewer state.
   restoreStateFromFile();
-  
   // Opens help window
   help();
 }

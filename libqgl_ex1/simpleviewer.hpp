@@ -4,8 +4,7 @@
 
 #include <QGLViewer/qglviewer.h>
 
-class Viewer : public QGLViewer
-{
+class Viewer : public QGLViewer {
 protected :
   virtual void draw();
   virtual void init();
