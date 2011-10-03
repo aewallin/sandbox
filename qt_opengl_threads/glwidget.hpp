@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QGLWidget>
 #include <QResizeEvent>
+#include <QtDebug>
 
 #include "glthread.hpp"
 
@@ -14,11 +15,12 @@ class GLWidget : public QGLWidget {
 public:
     GLWidget(QWidget *parent): QGLWidget(parent), glt(this)
     { 
-        setAutoBufferSwap(false);
+        setAutoBufferSwap(true);
         resize(320, 240);
+        this->doneCurrent();
     }
     void startRendering(){
-         glt.start();
+        glt.start();
     }
     void stopRendering(){
         glt.stop();

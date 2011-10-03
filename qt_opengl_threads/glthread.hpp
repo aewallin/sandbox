@@ -23,6 +23,8 @@ private:
     int h;
     float rotAngle;
     GLWidget *glw;
+    int id;
+    static int count;
 };
     
 #endif

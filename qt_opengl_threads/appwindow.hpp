@@ -56,15 +56,17 @@ class AppWindow : public QMainWindow {
         void newThread(){
             QWidgetList windows = ws->windowList();
             GLWidget *widget = new GLWidget(ws);
+            ws->addWindow(widget);
             widget->setWindowTitle("Thread #" + QString::number(windows.count() + 1));
             widget->show();
             widget->startRendering();
-            ws->addWindow(widget);
+            
         }
         void killThread(){
             GLWidget *widget = (GLWidget *)ws->activeWindow();    
             if (widget) {
                 widget->stopRendering();
+                
                 delete widget;
             }
         }
