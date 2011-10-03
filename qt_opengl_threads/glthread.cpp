@@ -1,5 +1,6 @@
 
 #include <QTime>
+#include <QtDebug>
 #include <GL/glut.h>
 
 #include "glthread.hpp"
@@ -7,16 +8,21 @@
 
 GLThread::GLThread(GLWidget *glWidget) : QThread(), glw(glWidget)
 {
+    qDebug() << "GLThread constructor..";
     doRendering = true;
     doResize = false;
+    qDebug() << "done";
 }
     
 void GLThread::resizeViewport(const QSize &size){
+    qDebug() << "resizeViewport..";
     w = size.width();
     h = size.height();
     doResize = true;
+    qDebug() << "done";
 }   
 void GLThread::run(){
+    qDebug() << "run..";
     //srand(QTime::currentTime().msec());
     rotAngle = rotAngle + 0.1; //rand() % 360;
         
@@ -43,7 +49,7 @@ void GLThread::run(){
         glw->swapBuffers();
         msleep(400);
     }
-
+    qDebug() << "done";
 }
 void GLThread::stop()   {
     doRendering = false;
