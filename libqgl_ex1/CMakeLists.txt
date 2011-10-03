@@ -12,7 +12,7 @@ MESSAGE(STATUS "QT_USE_FILE = " ${QT_USE_FILE} )
 
 # Find QGLViewer
 set( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR} )
-find_package(QGLViewer)
+find_package(QGLViewer REQUIRED)
 
 set( PROJECT_SRC 
      ${${PROJECT_NAME}_SOURCE_DIR}/main.cpp 
