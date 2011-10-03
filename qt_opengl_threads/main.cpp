@@ -1,4 +1,15 @@
 
+
+//
+// an attempt in October 2011 to convert this example 
+// http://doc.qt.nokia.com/qq/qq06-glimpsing.html#writingmultithreadedglapplications
+// from 2003 into something that compiles and runs on qt47.
+//
+// Anders Wallin, anders.e.e.wallin@gmail.com
+//
+// double-buffering doesn't seem to work.
+
+
 #include <QApplication>
 #include <Qt>
 
