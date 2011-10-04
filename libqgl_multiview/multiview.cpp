@@ -32,7 +32,7 @@ Viewer::Viewer(const Scene* const s, int type, QWidget* parent, const QGLWidget*
   setAxisIsDrawn();
   setGridIsDrawn();
 
-  if (type < 3)
+  if (type < 3) // type>=3 is a normal viewer where camera can rotate 
     {
       // Move camera according to viewer type (on X, Y or Z axis)
       camera()->setPosition(Vec((type==0)? 1.0 : 0.0, (type==1)? 1.0 : 0.0, (type==2)? 1.0 : 0.0));

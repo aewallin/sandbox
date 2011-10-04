@@ -37,14 +37,13 @@ int main(int argc, char** argv)
   Scene* s = new Scene();
 
   // Instantiate the viewers.
+  // ctor: const Scene* const s, int type, QWidget* parent, const QGLWidget* shareWidget=NULL
   Viewer side  (s,0,vSplit1);
   Viewer top   (s,1,vSplit1, &side);
   Viewer front (s,2,vSplit2, &side);
   Viewer persp (s,3,vSplit2, &side);
 
   hSplit->setWindowTitle("multiView");
-
   hSplit->show();
-
   return application.exec();
 }
