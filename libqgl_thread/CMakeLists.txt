@@ -18,6 +18,7 @@ set( PROJECT_SRC
      ${${PROJECT_NAME}_SOURCE_DIR}/main.cpp 
      ${${PROJECT_NAME}_SOURCE_DIR}/simpleviewer.cpp 
      ${${PROJECT_NAME}_SOURCE_DIR}/glthread.cpp 
+     ${${PROJECT_NAME}_SOURCE_DIR}/gldata.cpp 
 )
 
 include_directories( ${CMAKE_SOURCE_DIR} )
