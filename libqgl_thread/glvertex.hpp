@@ -45,6 +45,8 @@ struct GLVertex {
          : x(x), y(y), z(z), r(0), g(0), b(0) {}
     GLVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat r, GLfloat g, GLfloat b) 
          : x(x), y(y), z(z), r(r), g(g), b(b) {}
+    GLVertex(GLfloat x, GLfloat y, GLfloat z, GLfloat red, GLfloat gre, GLfloat blu, GLfloat xn, GLfloat yn, GLfloat zn) 
+         : x(x), y(y), z(z), r(red), g(gre), b(blu), nx(xn), ny(yn), nz(zn) {}
     void setNormal(GLfloat xn, GLfloat yn, GLfloat zn) {
         nx=xn;
         ny=yn;
@@ -71,7 +73,7 @@ struct GLVertex {
     QString str() { return QString("(%1, %2, %3 )").arg(x).arg(y).arg(z); }
     
 // DATA
-    GLfloat x,y,z; // position
+    GLfloat x,y,z; // position float=32bit = 4bytes.  3 variables*4bytes= 12 bytes.
     GLfloat r,g,b; // color, 12-bytes offset from position data.
     GLfloat nx,ny,nz; // normal, 24-bytes offset
     

@@ -1,6 +1,4 @@
-
 // attempt drawing to libqglviewer in a separate thread.
-
 #include "simpleviewer.hpp"
 #include <QApplication>
 #include <X11/Xlib.h>

@@ -25,7 +25,6 @@
 #include <boost/foreach.hpp>
 
 #include "gldata.hpp"
-//#include "octnode.hpp"
 
 
 GLData::GLData() {
@@ -40,7 +39,11 @@ GLData::GLData() {
 unsigned int GLData::addVertex(float x, float y, float z, float r, float g, float b) {
     return addVertex( GLVertex(x,y,z,r,g,b) );
 }
-    
+
+unsigned int GLData::addVertex(float x, float y, float z, float r, float g, float b, float nx, float ny, float nz) {
+    return addVertex( GLVertex(x,y,z,r,g,b,nx,ny,nz) );
+}
+
 unsigned int GLData::addVertex(GLVertex v) {
     // add vertex with empty polygon-list.
     unsigned int idx = vertexArray.size();

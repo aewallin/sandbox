@@ -32,6 +32,7 @@
 
 #include "glvertex.hpp"
 
+#define BUFFER_OFFSET(i) ((GLbyte *)NULL + (i))
 
 struct VertexData {
     void str() {
@@ -56,12 +57,10 @@ struct VertexData {
 class GLData {
 public:
     GLData();
-    /// add a vertex with given position and color, return its index
     unsigned int addVertex(float x, float y, float z, float r, float g, float b);
-    /// add vertex
+    unsigned int addVertex(float x, float y, float z, float r, float g, float b, float nx, float ny, float nz);
     unsigned int addVertex(GLVertex v);
-    /// add vertex, give position, color, Octnode*
-    //unsigned int addVertex(float x, float y, float z, float r, float g, float b);
+
     /// for a given vertex, set the normal
     void setNormal(unsigned int vertexIdx, float nx, float ny, float nz);
     /// remove vertex with given index
@@ -76,21 +75,18 @@ public:
     void genVBO();
     /// update VBO
     void updateVBO();
-    /// set polygon type to Triangles
-    void setTriangles() {setType(GL_TRIANGLES); polyVerts=3;}
-    /// set polygon type to Quads
-    void setQuads() {setType(GL_QUADS); polyVerts=4;}
-    /// set type to Points
-    void setPoints() {setType(GL_POINTS); polyVerts=1;}
-    void setLineStrip() {setType(GL_LINE_STRIP); polyVerts=1;}
-    void setLines() {setType(GL_LINES); polyVerts=2;}
     
+
+
+// set usage of VBO
     void setUsageStaticDraw() {usagePattern = QGLBuffer::StaticDraw;}
     void setUsageDynamicDraw() {usagePattern = QGLBuffer::DynamicDraw;}
+    
     /// bind the vertex and index buffers
     bool bind();
     /// release the vertex and index buffers
     void release();
+    
     void setPosition(float x, float y, float z);
     void print() ;
 //DATA
@@ -106,6 +102,13 @@ public:
     //                GL_QUADS,
     //                GL_POLYGON 
     GLenum type;
+// set type of data
+    void setTriangles() {setType(GL_TRIANGLES); polyVerts=3;}
+    void setQuads() {setType(GL_QUADS); polyVerts=4;}
+    void setPoints() {setType(GL_POINTS); polyVerts=1;}
+    void setLineStrip() {setType(GL_LINE_STRIP); polyVerts=1;}
+    void setLines() {setType(GL_LINES); polyVerts=2;}
+    void setQuadStrip() {setType(GL_QUAD_STRIP); polyVerts=4;}
     
     // usagePattern is set to one of:
     //    QGLBuffer::StreamDraw         The data will be set once and used a few times for drawing operations. Under OpenGL/ES 1.1 this is identical to StaticDraw.
@@ -120,10 +123,15 @@ public:
     QGLBuffer::UsagePattern usagePattern;
     
     GLenum polygonMode_face; // face = GL_FRONT | GL_BACK  | GL_FRONT_AND_BACK
+    void setPolygonModeFront() { polygonMode_face = GL_FRONT; }
+    void setPolygonModeBack() { polygonMode_face = GL_BACK; }
+    void setPolygonModeFrontAndBack() { polygonMode_face = GL_FRONT_AND_BACK; }
+    
     GLenum polygonMode_mode; // mode = GL_POINT, GL_LINE, GL_FILL
-    void setPolygonModeFill () {
-        polygonMode_mode = GL_FILL;
-    }
+    void setPolygonModeFill() { polygonMode_mode = GL_FILL; }
+    void setPolygonModePoint() { polygonMode_mode = GL_POINT; }
+    void setPolygonModeLine() { polygonMode_mode = GL_LINE; }
+    
     /// translation to be applied before drawing
     // fixme: use translation matrix instead.
     GLVertex pos;
@@ -132,12 +140,17 @@ public:
     typedef GLVertex vertex_type;
     static const GLenum index_type = GL_UNSIGNED_INT;
     static const GLenum coordinate_type = GL_FLOAT;
+    static const GLenum color_type = GL_FLOAT;
+    
     static const unsigned int vertex_offset = 0;
     static const unsigned int color_offset = 12;
     static const unsigned int normal_offset = 24;
 
     const GLVertex* getVertexArray() const {
         return vertexArray.data();
+    }
+    const GLuint* getIndexArray() const {
+        return indexArray.data();
     }
 protected:
     
