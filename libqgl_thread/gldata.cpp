@@ -33,7 +33,7 @@ GLData::GLData() {
     polyVerts = 3;
     polygonMode_face = GL_FRONT_AND_BACK;
     polygonMode_mode = GL_LINE;
-    usagePattern = QGLBuffer::StaticDraw;
+
 }
 
 unsigned int GLData::addVertex(float x, float y, float z, float r, float g, float b) {
@@ -49,15 +49,10 @@ unsigned int GLData::addVertex(GLVertex v) {
     unsigned int idx = vertexArray.size();
     vertexArray.append(v);
     vertexDataArray.append( VertexData() );
-    //vertexDataArray[idx].node = n;
     assert( vertexArray.size() == vertexDataArray.size() );
     return idx; // return index of newly appended vertex
 }
-/*
-unsigned int GLData::addVertex(float x, float y, float z, float r, float g, float b) {
-    unsigned int id = addVertex(x,y,z,r,g,b);
-    return id;
-}*/
+
 
 void GLData::setNormal(unsigned int vertexIdx, float nx, float ny, float nz) {
     vertexArray[vertexIdx].setNormal(nx,ny,nz);
@@ -127,30 +122,6 @@ void GLData::removePolygon( unsigned int polygonIdx) {
     indexArray.resize( indexArray.size()-polyVerts ); // shorten array
     //std::cout << "   removePolygon( " << polygonIdx << " ) done.\n";
 } 
-
-void GLData::genVBO() {
-    vertexBuffer = makeBuffer(  QGLBuffer::VertexBuffer, vertexArray );
-    indexBuffer = makeBuffer( QGLBuffer::IndexBuffer, indexArray );
-}
-
-void GLData::updateVBO() {
-    updateBuffer( vertexBuffer, vertexArray );
-    updateBuffer( indexBuffer, indexArray );
-}
-
-bool GLData::bind() {
-    return (vertexBuffer->bind() && indexBuffer->bind());
-}
-/// release the vertex and index buffers
-void GLData::release() {
-    vertexBuffer->release();
-    indexBuffer->release();
-}
-
-// ? replace with transformation-matrix
-void GLData::setPosition(float x, float y, float z) {
-    pos = GLVertex(x,y,z);
-}
     
 void GLData::print() {
     std::cout << "GLData vertices: \n";

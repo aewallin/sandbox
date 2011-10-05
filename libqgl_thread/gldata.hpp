@@ -75,23 +75,7 @@ public:
     void removePolygon( unsigned int polygonIdx);
     /// return the number of polygons
     int polygonCount() const { return indexArray.size(); }
-    /// generate the VBOs
-    void genVBO();
-    /// update VBO
-    void updateVBO();
-    
 
-
-// set usage of VBO
-    void setUsageStaticDraw() {usagePattern = QGLBuffer::StaticDraw;}
-    void setUsageDynamicDraw() {usagePattern = QGLBuffer::DynamicDraw;}
-    
-    /// bind the vertex and index buffers
-    bool bind();
-    /// release the vertex and index buffers
-    void release();
-    
-    void setPosition(float x, float y, float z);
     void print() ;
 //DATA
     // the type of this GLData, one of:
@@ -113,18 +97,6 @@ public:
     void setLineStrip() {setType(GL_LINE_STRIP); polyVerts=1;}
     void setLines() {setType(GL_LINES); polyVerts=2;}
     void setQuadStrip() {setType(GL_QUAD_STRIP); polyVerts=1;}
-    
-    // usagePattern is set to one of:
-    //    QGLBuffer::StreamDraw         The data will be set once and used a few times for drawing operations. Under OpenGL/ES 1.1 this is identical to StaticDraw.
-    //    QGLBuffer::StreamRead         The data will be set once and used a few times for reading data back from the GL server. Not supported under OpenGL/ES.
-    //    QGLBuffer::StreamCopy         The data will be set once and used a few times for reading data back from the GL server for use in further drawing operations. Not supported under OpenGL/ES.
-    //    QGLBuffer::StaticDraw         The data will be set once and used many times for drawing operations.
-    //    QGLBuffer::StaticRead         The data will be set once and used many times for reading data back from the GL server. Not supported under OpenGL/ES.
-    //    QGLBuffer::StaticCopy         The data will be set once and used many times for reading data back from the GL server for use in further drawing operations. Not supported under OpenGL/ES.
-    //    QGLBuffer::DynamicDraw        The data will be modified repeatedly and used many times for drawing operations.
-    //    QGLBuffer::DynamicRead        The data will be modified repeatedly and used many times for reading data back from the GL server. Not supported under OpenGL/ES.
-    //    QGLBuffer::DynamicCopy        The data will be modified repeatedly and used many times for reading data back from the GL server for use in further drawing operations. Not supported under OpenGL/ES
-    QGLBuffer::UsagePattern usagePattern;
     
     GLenum polygonMode_face; // face = GL_FRONT | GL_BACK  | GL_FRONT_AND_BACK
     void setPolygonModeFront() { polygonMode_face = GL_FRONT; }
@@ -159,46 +131,9 @@ public:
     QMutex mutex; // renderer locks this while rendering.
                   // swap-buffer locks this while swapping
 protected:
-    
-    template <class Data>
-    void updateBuffer(  QGLBuffer* buffer, Data& d) {
-        //std::cout << " gldata.hpp updateBuffer() \n" << std::flush ;
-        if (!buffer->bind()) {
-            std::cout << " gldata.hpp updateBuffer() ERROR could not bind buffer data.size()="<< d.size() << "\n";
-            //assert(0);
-        }
-        buffer->allocate( d.data(), sizeof(typename Data::value_type)*d.size() );
-        buffer->release();
-    }
-    
-    template <class Data>
-    QGLBuffer* makeBuffer(  QGLBuffer::Type t, Data& d) {
-        QGLBuffer* buffer = new QGLBuffer(t);
-        buffer->create();
-        if (!buffer->bind()) {
-            std::cout << " gldata.hpp makeBuffer() ERROR could not bind buffer data.size()="<< d.size() << "\n";
-            //assert(0);
-        }
-        buffer->setUsagePattern( usagePattern );
-        buffer->allocate( d.data(), sizeof(typename Data::value_type)*d.size() );
-        buffer->release();
-        return buffer;
-    }
-    
-    /*
-    bool unmap () {
-        return ( vertexBuffer->unmap() && indexBuffer->unmap() );
-    }
-    // return pointer to buffer 
-    void* mapVertex( QGLBuffer::Access acc ) {
-        return vertexBuffer->map(acc); // assumes create() and bind()
-    }*/
-    
-    
     /// set type of drawing, e.g. GL_TRIANGLES, GL_QUADS
     void setType(GLenum t) { type = t; }
-    /// set the OpenGL usage pattern
-    void setUsage(QGLBuffer::UsagePattern p ) { usagePattern = p; }
+
     
 // DATA
     /// vertex data buffer
@@ -211,19 +146,6 @@ protected:
     QVarLengthArray<GLVertex> vertexArray;
     QVarLengthArray<VertexData> vertexDataArray;
     QVarLengthArray<GLuint> indexArray;
-    
-    QVarLengthArray<GLVertex> vertexArray_work;
-    QVarLengthArray<VertexData> vertexDataArray_work;
-    QVarLengthArray<GLuint> indexArray_work;
-    
-    void swap() {
-        // copy data to the arrays that get rendered
-        QMutexLocker locker( &mutex );
-        vertexArray = vertexArray_work;
-        vertexDataArray = vertexDataArray_work;
-        indexArray = indexArray_work;
-    }
-    
 };
 
 
