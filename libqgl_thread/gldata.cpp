@@ -64,8 +64,6 @@ void GLData::setNormal(unsigned int vertexIdx, float nx, float ny, float nz) {
 }
 
 void GLData::removeVertex( unsigned int vertexIdx ) {
-    //std::cout << "GLData::removeVertex( " << vertexIdx << " with " << vertexDataArray[vertexIdx].polygons.size() << " polys )\n";
-    
     // i) for each polygon of this vertex, call remove_polygon:
     typedef std::set< unsigned int, std::greater<unsigned int> > PolygonSet;
     PolygonSet pset = vertexDataArray[vertexIdx].polygons;
@@ -78,11 +76,6 @@ void GLData::removeVertex( unsigned int vertexIdx ) {
     if (vertexIdx != lastIdx) {
         vertexArray[vertexIdx] = vertexArray[lastIdx];
         vertexDataArray[vertexIdx] = vertexDataArray[lastIdx];
-        // notify octree-node with new index here!
-        // vertex that was at lastIdx is now at vertexIdx
-        //std::cout << " swapindex( " << lastIdx << " - " << vertexIdx << ")\n";
-        //vertexDataArray[vertexIdx].node->swapIndex( lastIdx, vertexIdx );
-        
         // request each polygon to re-number this vertex.
         BOOST_FOREACH( unsigned int polygonIdx, vertexDataArray[vertexIdx].polygons ) {
             unsigned int idx = polygonIdx*polyVerts;

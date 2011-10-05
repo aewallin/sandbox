@@ -10,15 +10,20 @@
 #include <QVarLengthArray>
 
 #include "gldata.hpp"
+#include "glthread.hpp"
 
 class Viewer : public QGLViewer {
+    Q_OBJECT
 public:
     Viewer(QWidget *parent);
+    ~Viewer();
+public slots:
+    void slotDraw() {
+        updateGL();
+    }
 protected :
     void drawGLData(GLData* gl);
-    void drawImmediate();
-    //GLThread glt;
-    void makeData();
+    GLThread* glt;
     virtual void draw(); // also emits drawNeeded()
     virtual void init();
     virtual QString helpString() const;

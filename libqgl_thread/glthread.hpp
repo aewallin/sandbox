@@ -1,4 +1,3 @@
-
 #ifndef GLTHREAD_HPP
 #define GLTHREAD_HPP
 
@@ -6,23 +5,21 @@
 #include <QThread>
 #include <QSize>
 
-class Viewer;
+class GLData;
 
 class GLThread : public QThread {
-    //Q_OBJECT
+    Q_OBJECT
 public:
-    GLThread(Viewer *glWidget);
-    void resizeViewport(const QSize &size);  
+    GLThread(GLData *gl);
     void run();
     void stop();
+signals:
+    void signalUpdate(); // when data is modified, emit signalUpdate()
 private:
-    void glDrawTriangle();
+    void makeData();
+    GLData* g;
     bool doRendering;
-    bool doResize;
-    int w;
-    int h;
     float rotAngle;
-    Viewer *glw;
     int id;
     static int count;
 };

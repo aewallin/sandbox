@@ -23,6 +23,9 @@
 #include <QObject>
 #include <QGLBuffer>
 #include <QVarLengthArray>
+#include <QMutex>
+#include <QMutexLocker>
+
 
 #include <iostream>
 #include <set>
@@ -34,6 +37,7 @@
 
 #define BUFFER_OFFSET(i) ((GLbyte *)NULL + (i))
 
+// additional data, not strictly required for OpenGL rendering is stored here
 struct VertexData {
     void str() {
         BOOST_FOREACH( GLuint pIdx, polygons ) {
@@ -108,7 +112,7 @@ public:
     void setPoints() {setType(GL_POINTS); polyVerts=1;}
     void setLineStrip() {setType(GL_LINE_STRIP); polyVerts=1;}
     void setLines() {setType(GL_LINES); polyVerts=2;}
-    void setQuadStrip() {setType(GL_QUAD_STRIP); polyVerts=4;}
+    void setQuadStrip() {setType(GL_QUAD_STRIP); polyVerts=1;}
     
     // usagePattern is set to one of:
     //    QGLBuffer::StreamDraw         The data will be set once and used a few times for drawing operations. Under OpenGL/ES 1.1 this is identical to StaticDraw.
@@ -152,6 +156,8 @@ public:
     const GLuint* getIndexArray() const {
         return indexArray.data();
     }
+    QMutex mutex; // renderer locks this while rendering.
+                  // swap-buffer locks this while swapping
 protected:
     
     template <class Data>
@@ -201,14 +207,23 @@ protected:
     QGLBuffer* indexBuffer;
     /// number of vertices per polygon. 1 for GL_POINTS, 3 for GL_TRIANGLES, 4 for GL_QUADS
     int polyVerts; 
-    /// vertices stored in this array. this array is bound to the OpenGL buffer
-    /// and used directly for drawing as the OpenGL vertex position, color, and normal array.
+
     QVarLengthArray<GLVertex> vertexArray;
-    /// extra vertex data is stored here. this data is not needed for OpenGL drawing.
-    /// but it is required for the isosurface-algorithms (marching-cubes / dual contouring)
     QVarLengthArray<VertexData> vertexDataArray;
-    /// this is the index array for drawing polygons. used by OpenGL glDrawElements
     QVarLengthArray<GLuint> indexArray;
+    
+    QVarLengthArray<GLVertex> vertexArray_work;
+    QVarLengthArray<VertexData> vertexDataArray_work;
+    QVarLengthArray<GLuint> indexArray_work;
+    
+    void swap() {
+        // copy data to the arrays that get rendered
+        QMutexLocker locker( &mutex );
+        vertexArray = vertexArray_work;
+        vertexDataArray = vertexDataArray_work;
+        indexArray = indexArray_work;
+    }
+    
 };
 
 
