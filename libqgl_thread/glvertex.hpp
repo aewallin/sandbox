@@ -22,6 +22,9 @@
 
 #include <cassert>
 #include <cmath>
+#include <iostream>
+#include <sstream>
+
 #include <QGLBuffer>
 #include <QString>
 

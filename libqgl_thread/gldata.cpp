@@ -53,6 +53,10 @@ unsigned int GLData::addVertex(GLVertex v) {
     return idx; // return index of newly appended vertex
 }
 
+void GLData::modifyVertex( unsigned int id, float x, float y, float z, float r, float g, float b, float nx, float ny, float nz) {
+    GLVertex p = GLVertex(x,y,z,r,g,b,nx,ny,nz);
+    vertexArray[id] = p;
+}
 
 void GLData::setNormal(unsigned int vertexIdx, float nx, float ny, float nz) {
     vertexArray[vertexIdx].setNormal(nx,ny,nz);

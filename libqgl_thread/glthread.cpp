@@ -6,6 +6,9 @@
 
 #include <QGLViewer/qglviewer.h>
 
+#include <boost/foreach.hpp>
+
+
 #include "glthread.hpp"
 #include "gldata.hpp"
 
@@ -18,17 +21,22 @@ GLThread::GLThread(GLData* gl) : QThread(), g(gl) {
   
 void GLThread::run(){
     qDebug() << id << ":run..";
-    makeData();
+    makeData(); // create initial data
 
     while (doRendering) {
-        rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
+        rotAngle = rotAngle + (id+1)*0.3; // threads rotate pyramid at different rate!
         qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
-
+        
         g->mutex.lock();
-        g->removeVertex(0);
+        for (unsigned int n = 0; n<verts.size(); n++) {
+            GLVertex orig = verts[n];
+            GLVertex mod= orig + GLVertex( 0, 0.1*cos(0.1*n+rotAngle), 0);
+            //verts[n] = mod;
+            g->modifyVertex( n, mod.x, mod.y, mod.z, mod.r, mod.g, mod.b, mod.nx, mod.ny, mod.nz );
+        }
         g->mutex.unlock();
         emit signalUpdate();
-        msleep(400);
+        msleep(40);
     }
 }
 
@@ -41,8 +49,8 @@ void GLThread::makeData() {
     g->setQuadStrip();
     g->setPolygonModeFill();
     //g->setPolygonModeLine();
-    //g->setPolygonModeFrontAndBack();
-    g->setPolygonModeFront();
+    g->setPolygonModeFrontAndBack();
+    //g->setPolygonModeFront();
     const float nbSteps = 200.0;
     for (int i=0; i<nbSteps; ++i) {
         const float ratio = i/nbSteps;
@@ -68,5 +76,9 @@ void GLThread::makeData() {
         unsigned int id2 = g->addVertex( p2_x, p2_y, p2_z, red, gre, blu, nx, ny, nz );
         p2.push_back(id2);
         g->addPolygon(p2);
+        
+        // store verts for later reference
+        verts.push_back( GLVertex(p1_x, p1_y, p1_z, red, gre, blu, nx, ny, nz  ) );
+        verts.push_back( GLVertex(p2_x, p2_y, p2_z, red, gre, blu, nx, ny, nz  ) );
     }
 }

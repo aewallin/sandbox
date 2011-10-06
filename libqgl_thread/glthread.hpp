@@ -5,6 +5,10 @@
 #include <QThread>
 #include <QSize>
 
+#include <vector>
+
+#include "glvertex.hpp"
+
 class GLData;
 
 class GLThread : public QThread {
@@ -22,6 +26,8 @@ private:
     float rotAngle;
     int id;
     static int count;
+    std::vector<GLVertex> verts;
+    
 };
     
 #endif

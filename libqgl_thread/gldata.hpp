@@ -39,11 +39,6 @@
 
 // additional data, not strictly required for OpenGL rendering is stored here
 struct VertexData {
-    void str() {
-        BOOST_FOREACH( GLuint pIdx, polygons ) {
-            std::cout << pIdx << " ";
-        }
-    }
     inline void addPolygon( unsigned int idx ) { polygons.insert( idx ); }
     inline void removePolygon(unsigned int idx ) { polygons.erase( idx ); }
     inline bool empty() { return polygons.empty(); }
@@ -53,7 +48,11 @@ struct VertexData {
     typedef std::set< unsigned int, std::greater<unsigned int> > PolygonSet;
     /// the polygons to which this vertex belongs. i.e. for each vertex we store in this set all the polygons to which it belongs.
     PolygonSet polygons;
-    
+    void str() {
+        BOOST_FOREACH( GLuint pIdx, polygons ) {
+            std::cout << pIdx << " ";
+        }
+    }
 };
 
 
@@ -64,18 +63,12 @@ public:
     unsigned int addVertex(float x, float y, float z, float r, float g, float b);
     unsigned int addVertex(float x, float y, float z, float r, float g, float b, float nx, float ny, float nz);
     unsigned int addVertex(GLVertex v);
-
-    /// for a given vertex, set the normal
-    void setNormal(unsigned int vertexIdx, float nx, float ny, float nz);
-    /// remove vertex with given index
-    void removeVertex( unsigned int vertexIdx );
-    /// add a polygon, return its index
-    int addPolygon( std::vector<GLuint>& verts);
-    /// remove polygon at given index
-    void removePolygon( unsigned int polygonIdx);
-    /// return the number of polygons
-    int polygonCount() const { return indexArray.size(); }
-
+    void modifyVertex( unsigned int id, float x, float y, float z, float r, float g, float b, float nx, float ny, float nz);
+    void setNormal(unsigned int id, float nx, float ny, float nz);
+    void removeVertex( unsigned int id );
+    int addPolygon( std::vector<GLuint>& verts );
+    void removePolygon( unsigned int polygonIdx );
+    int indexCount() const { return indexArray.size(); }
     void print() ;
 //DATA
     // the type of this GLData, one of:
@@ -90,7 +83,6 @@ public:
     //                GL_QUADS,
     //                GL_POLYGON 
     GLenum type;
-// set type of data
     void setTriangles() {setType(GL_TRIANGLES); polyVerts=3;}
     void setQuads() {setType(GL_QUADS); polyVerts=4;}
     void setPoints() {setType(GL_POINTS); polyVerts=1;}
@@ -122,12 +114,8 @@ public:
     static const unsigned int color_offset = 12;
     static const unsigned int normal_offset = 24;
 
-    const GLVertex* getVertexArray() const {
-        return vertexArray.data();
-    }
-    const GLuint* getIndexArray() const {
-        return indexArray.data();
-    }
+    const GLVertex* getVertexArray() const { return vertexArray.data(); }
+    const GLuint* getIndexArray() const { return indexArray.data(); }
     QMutex mutex; // renderer locks this while rendering.
                   // swap-buffer locks this while swapping
 protected:

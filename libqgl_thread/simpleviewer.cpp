@@ -46,7 +46,7 @@ void Viewer::drawGLData(GLData* gl) {
     glVertexPointer( 3, GLData::coordinate_type, sizeof( GLData::vertex_type ), ((GLbyte*)g->getVertexArray()  + GLData::vertex_offset  ) ); 
     // http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml
     //              mode       idx-count             type               offset/pointer
-    glDrawElements( gl->type , gl->polygonCount() , GLData::index_type, g->getIndexArray());
+    glDrawElements( gl->type , gl->indexCount() , GLData::index_type, g->getIndexArray());
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
