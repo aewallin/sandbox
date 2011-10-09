@@ -18,15 +18,15 @@ public:
     Viewer(QWidget *parent);
     ~Viewer();
 public slots:
-    void slotDraw() {
-        updateGL();
-    }
+    void slotDraw() { updateGL(); }
 protected :
     void drawGLData(GLData* gl);
-    GLThread* glt;
     virtual void draw(); // also emits drawNeeded()
     virtual void init();
+    virtual void postDraw();
     virtual QString helpString() const;
+    void drawCornerAxis();
+    GLThread* glt;
     GLData* g;
 };
 
