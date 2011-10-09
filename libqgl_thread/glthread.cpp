@@ -17,26 +17,38 @@ int GLThread::count = 0;
 GLThread::GLThread(GLData* gl) : QThread(), g(gl) {
     id = count++;
     qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " Created";
+    sleepMilliseconds = 43;
 }
-  
-void GLThread::run(){
+
+void GLThread::run() {
     qDebug() << id << ":run..";
     makeData(); // create initial data
+    g->swap();
 
     while (doRendering) {
-        rotAngle = rotAngle + (id+1)*0.3; // threads rotate pyramid at different rate!
+        rotAngle = rotAngle + 0.3; 
         qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
         
-        g->mutex.lock();
+        timer.start();
+        g->workMutex.lock();
         for (unsigned int n = 0; n<verts.size(); n++) {
             GLVertex orig = verts[n];
             GLVertex mod= orig + GLVertex( 0, 0.1*cos(0.1*n+rotAngle), 0);
-            //verts[n] = mod;
             g->modifyVertex( n, mod.x, mod.y, mod.z, mod.r, mod.g, mod.b, mod.nx, mod.ny, mod.nz );
         }
-        g->mutex.unlock();
-        emit signalUpdate();
-        msleep(40);
+        g->workMutex.unlock();
+        qDebug() << " modifyVertex took: " << timer.str() ;
+        
+        timer.start();
+        g->swapBuffers();
+        qDebug() << " swap took: " << timer.str() ;
+        
+        emit signalUpdate(); // signal the Viewer that new GL-data exists for rendering
+        
+        timer.start();
+        g->copyBuffers();
+        qDebug() << " copyBuffers took: " << timer.str() ;
+        msleep( sleepMilliseconds );
     }
 }
 
@@ -46,6 +58,7 @@ void GLThread::stop()   {
 }
 
 void GLThread::makeData() {
+    qDebug() << id << ":makeData()..";
     g->setQuadStrip();
     g->setPolygonModeFill();
     //g->setPolygonModeLine();
@@ -73,12 +86,12 @@ void GLThread::makeData() {
         p1.push_back(id1);
         g->addPolygon(p1);
         std::vector<GLuint> p2;
-        unsigned int id2 = g->addVertex( p2_x, p2_y, p2_z, red, gre, blu, nx, ny, nz );
+        unsigned int id2 = g->addVertex( p2_x, p2_y, p2_z, red, gre, blu, nx, ny, nz );        
         p2.push_back(id2);
         g->addPolygon(p2);
-        
         // store verts for later reference
         verts.push_back( GLVertex(p1_x, p1_y, p1_z, red, gre, blu, nx, ny, nz  ) );
         verts.push_back( GLVertex(p2_x, p2_y, p2_z, red, gre, blu, nx, ny, nz  ) );
     }
+    qDebug() << id << ":makeData()..DONE";
 }

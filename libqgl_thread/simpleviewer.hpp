@@ -8,6 +8,7 @@
 #include <QResizeEvent>
 #include <QtDebug>
 #include <QVarLengthArray>
+#include <QTime>
 
 #include "gldata.hpp"
 #include "glthread.hpp"
@@ -18,7 +19,10 @@ public:
     Viewer(QWidget *parent);
     ~Viewer();
 public slots:
-    void slotDraw() { updateGL(); }
+    void slotNewDataWaiting() { 
+        if ( time.elapsed() > 17)  // 60fps = 1 frame per 17 milliseconds)
+            updateGL(); // only call if sufficient time elapsed since last draw()
+    }
 protected :
     void drawGLData(GLData* gl);
     virtual void draw(); // also emits drawNeeded()
@@ -28,6 +32,7 @@ protected :
     void drawCornerAxis();
     GLThread* glt;
     GLData* g;
+    QTime time;
 };
 
 #endif

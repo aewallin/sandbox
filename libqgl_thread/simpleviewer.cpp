@@ -12,8 +12,7 @@ Viewer::Viewer(QWidget *parent)  {
     glt = new GLThread(g);
     glt->start(); // makes and updates the GLData
     connect( glt, SIGNAL( signalUpdate() ),     // when glthread has a modified the gldata
-           this,   SLOT(  slotDraw() )   );     // draw it by calling updateGL
-               
+           this,   SLOT(  slotNewDataWaiting() )   );     // draw it by calling updateGL
 }
 
 Viewer::~Viewer() {
@@ -28,11 +27,13 @@ void Viewer::draw()
 {
     qDebug() << QTime::currentTime() << " Viewer::draw() ";
     drawGLData(g);
+    time.start(); // start the clock here.
+    
 }
 
 void Viewer::drawGLData(GLData* gl) {
-    QMutexLocker locker( &(g->mutex) );
-    glPolygonMode( gl->polygonMode_face, gl->polygonMode_mode ); 
+    QMutexLocker locker( &(gl->renderMutex) );
+    glPolygonMode( gl->polygonFaceMode(), gl->polygonFillMode()  ); 
     // draw using vertex-array
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -46,7 +47,7 @@ void Viewer::drawGLData(GLData* gl) {
     glVertexPointer( 3, GLData::coordinate_type, sizeof( GLData::vertex_type ), ((GLbyte*)g->getVertexArray()  + GLData::vertex_offset  ) ); 
     // http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml
     //              mode       idx-count             type               offset/pointer
-    glDrawElements( gl->type , gl->indexCount() , GLData::index_type, g->getIndexArray());
+    glDrawElements( gl->GLType() , gl->indexCount() , GLData::index_type, g->getIndexArray());
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);

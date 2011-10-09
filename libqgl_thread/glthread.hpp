@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "glvertex.hpp"
+#include "nanotimer.hpp"
 
 class GLData;
 
@@ -27,7 +28,8 @@ private:
     int id;
     static int count;
     std::vector<GLVertex> verts;
-    
+    Nanotimer timer;
+    int sleepMilliseconds;
 };
     
 #endif

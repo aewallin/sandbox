@@ -22,6 +22,8 @@
 #include <set>
 #include <vector>
 
+#include <QtDebug>
+
 #include <boost/foreach.hpp>
 
 #include "gldata.hpp"
@@ -29,11 +31,15 @@
 
 GLData::GLData() {
     // some reasonable defaults...
-    type = GL_TRIANGLES;
-    polyVerts = 3;
-    polygonMode_face = GL_FRONT_AND_BACK;
-    polygonMode_mode = GL_LINE;
-
+    renderIndex = 0;
+    workIndex = 1;
+    
+    glp[workIndex].type = GL_TRIANGLES;
+    glp[workIndex].polyVerts = 3;
+    glp[workIndex].polygonMode_face = GL_FRONT_AND_BACK;
+    glp[workIndex].polygonMode_mode = GL_LINE;
+    
+    swap(); // to intialize glp etc.. (?)
 }
 
 unsigned int GLData::addVertex(float x, float y, float z, float r, float g, float b) {
@@ -46,20 +52,20 @@ unsigned int GLData::addVertex(float x, float y, float z, float r, float g, floa
 
 unsigned int GLData::addVertex(GLVertex v) {
     // add vertex with empty polygon-list.
-    unsigned int idx = vertexArray.size();
-    vertexArray.append(v);
+    unsigned int idx = vertexArray[workIndex].size();
+    vertexArray[workIndex].append(v);
     vertexDataArray.append( VertexData() );
-    assert( vertexArray.size() == vertexDataArray.size() );
+    assert( vertexArray[workIndex].size() == vertexDataArray.size() );
     return idx; // return index of newly appended vertex
 }
 
 void GLData::modifyVertex( unsigned int id, float x, float y, float z, float r, float g, float b, float nx, float ny, float nz) {
     GLVertex p = GLVertex(x,y,z,r,g,b,nx,ny,nz);
-    vertexArray[id] = p;
+    vertexArray[workIndex][id] = p;
 }
 
 void GLData::setNormal(unsigned int vertexIdx, float nx, float ny, float nz) {
-    vertexArray[vertexIdx].setNormal(nx,ny,nz);
+    vertexArray[workIndex][vertexIdx].setNormal(nx,ny,nz);
 }
 
 void GLData::removeVertex( unsigned int vertexIdx ) {
@@ -71,31 +77,31 @@ void GLData::removeVertex( unsigned int vertexIdx ) {
         removePolygon( polygonIdx );
     }
     // ii) overwrite with last vertex:
-    unsigned int lastIdx = vertexArray.size()-1;
+    unsigned int lastIdx = vertexArray[workIndex].size()-1;
     if (vertexIdx != lastIdx) {
-        vertexArray[vertexIdx] = vertexArray[lastIdx];
+        vertexArray[workIndex][vertexIdx] = vertexArray[workIndex][lastIdx];
         vertexDataArray[vertexIdx] = vertexDataArray[lastIdx];
         // request each polygon to re-number this vertex.
         BOOST_FOREACH( unsigned int polygonIdx, vertexDataArray[vertexIdx].polygons ) {
-            unsigned int idx = polygonIdx*polyVerts;
-            for (int m=0;m<polyVerts;++m) {
-                if ( indexArray[ idx+m ] == lastIdx )
-                    indexArray[ idx+m ] = vertexIdx;
+            unsigned int idx = polygonIdx * polygonVertices();
+            for (int m=0;m<polygonVertices();++m) {
+                if ( indexArray[workIndex][ idx+m ] == lastIdx )
+                    indexArray[workIndex][ idx+m ] = vertexIdx;
             }
         }
     }
     // shorten array
-    vertexArray.resize( vertexArray.size()-1 );
+    vertexArray[workIndex].resize( vertexArray[workIndex].size()-1 );
     vertexDataArray.resize( vertexDataArray.size()-1 );
-    assert( vertexArray.size() == vertexDataArray.size() );
+    assert( vertexArray[workIndex].size() == vertexDataArray.size() );
     //std::cout << " removeVertex done.\n";
 }
 
 int GLData::addPolygon( std::vector<GLuint>& verts) {
     // append to indexArray, request each vertex to update
-    unsigned int polygonIdx = indexArray.size()/polyVerts;
+    unsigned int polygonIdx = indexArray[workIndex].size()/polygonVertices();
     BOOST_FOREACH( GLuint vertex, verts ) {
-        indexArray.append(vertex);
+        indexArray[workIndex].append(vertex);
         vertexDataArray[vertex].addPolygon(polygonIdx); // add index to vertex i1
     }
     return polygonIdx;
@@ -103,46 +109,44 @@ int GLData::addPolygon( std::vector<GLuint>& verts) {
 
 void GLData::removePolygon( unsigned int polygonIdx) {
     //std::cout << "   GLData::removePolygon( " << polygonIdx << " )\n";
-    unsigned int idx = polyVerts*polygonIdx; // start-index for polygon
+    unsigned int idx = polygonVertices()*polygonIdx; // start-index for polygon
     
     // i) request remove for each vertex in polygon:
-    for (int m=0; m<polyVerts ; ++m) // this polygon has the following 3/4 vertices. we call removePolygon on them all
-        vertexDataArray[ indexArray[idx+m]   ].removePolygon(polygonIdx);
+    for (int m=0; m<polygonVertices() ; ++m) // this polygon has the following 3/4 vertices. we call removePolygon on them all
+        vertexDataArray[ indexArray[workIndex][idx+m]   ].removePolygon(polygonIdx);
     
-    // check for orphan vertices (?), and delete them (?)
-    
-    unsigned int last_index = (indexArray.size()-polyVerts);
+    unsigned int last_index = (indexArray[workIndex].size()-polygonVertices() );
     // if deleted polygon is last on the list, do nothing??
     if (idx!=last_index) { 
         // ii) remove from polygon-list by overwriting with last element
-        for (int m=0; m<polyVerts ; ++m)
-            indexArray[idx+m  ] = indexArray[ last_index+m   ];
+        for (int m=0; m<polygonVertices() ; ++m)
+            indexArray[workIndex][idx+m  ] = indexArray[workIndex][ last_index+m   ];
         // iii) for the moved polygon, request that each vertex update the polygon number
-        for (int m=0; m<polyVerts ; ++m) {
-            vertexDataArray[ indexArray[idx+m   ] ].addPolygon( idx/polyVerts ); // this is the new polygon index
-            vertexDataArray[ indexArray[idx+m   ] ].removePolygon( last_index/polyVerts ); // this polygon is no longer there!
+        for (int m=0; m<polygonVertices() ; ++m) {
+            vertexDataArray[ indexArray[workIndex][idx+m   ] ].addPolygon( idx/polygonVertices() ); // this is the new polygon index
+            vertexDataArray[ indexArray[workIndex][idx+m   ] ].removePolygon( last_index/polygonVertices() ); // this polygon is no longer there!
         }
     }
-    indexArray.resize( indexArray.size()-polyVerts ); // shorten array
+    indexArray[workIndex].resize( indexArray[workIndex].size()- polygonVertices() ); // shorten array
     //std::cout << "   removePolygon( " << polygonIdx << " ) done.\n";
 } 
     
 void GLData::print() {
     std::cout << "GLData vertices: \n";
     //int n = 0;
-    for( int n = 0; n < vertexArray.size(); ++n ) {
+    for( int n = 0; n < vertexArray[workIndex].size(); ++n ) {
         std::cout << n << " : ";
-        vertexArray[n].str();
+        vertexArray[workIndex][n].str();
         std::cout << " polys: "; 
         //vertexDataArray[n].str();
         std::cout << "\n";
     }
     std::cout << "GLData polygons: \n";
     int polygonIndex = 0;
-    for( int n=0; n< indexArray.size(); n=n+polyVerts) {
+    for( int n=0; n< indexArray[workIndex].size(); n=n+polygonVertices() ) {
         std::cout << polygonIndex << " : ";
-        for (int m=0;m<polyVerts;++m)
-            std::cout << indexArray[n+m] << " "; 
+        for (int m=0;m<polygonVertices() ;++m)
+            std::cout << indexArray[workIndex][n+m] << " "; 
         std::cout << "\n";
         ++polygonIndex;
     }
