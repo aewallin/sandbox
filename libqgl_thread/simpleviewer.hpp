@@ -23,6 +23,13 @@ public slots:
         if ( time.elapsed() > 17)  // 60fps = 1 frame per 17 milliseconds)
             updateGL(); // only call if sufficient time elapsed since last draw()
     }
+    virtual bool close() {
+        qDebug() << " close() called ";
+        glt->stop();
+        glt->wait();
+        QGLViewer::close();
+        return true;
+    }
 protected :
     void drawGLData(GLData* gl);
     virtual void draw(); // also emits drawNeeded()

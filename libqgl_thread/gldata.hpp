@@ -35,8 +35,6 @@
 
 #include "glvertex.hpp"
 
-#define BUFFER_OFFSET(i) ((GLbyte *)NULL + (i))
-
 // additional data, not strictly required for OpenGL rendering is stored here
 struct VertexData {
     inline void addPolygon( unsigned int idx )   { polygons.insert( idx );  }
