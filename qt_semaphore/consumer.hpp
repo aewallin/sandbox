@@ -18,9 +18,9 @@ public:
     
     void run(){
         for (int i = 0; i < ds; ++i) {
-            ub->acquire();
+            ub->acquire(); // acquire used
             fprintf(stderr, "%c", buf[i % bs]);
-            fb->release();
+            fb->release(); // release free
         }
         fprintf(stderr, "\n");
     }

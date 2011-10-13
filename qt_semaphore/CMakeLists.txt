@@ -11,19 +11,8 @@ FIND_PACKAGE(Qt4 COMPONENTS QtCore QtGui QtXml QtOpenGL REQUIRED)
 INCLUDE(${QT_USE_FILE})
 MESSAGE(STATUS "QT_USE_FILE = " ${QT_USE_FILE} )
 
-
-
-set( MOC_HEADERS 
-   # mandelbrotwidget.hpp
-   # renderthread.hpp
-)
-qt4_wrap_cpp(MOC_OUTFILES ${MOC_HEADERS})
-
 set( PROJECT_SRC 
      ${${PROJECT_NAME}_SOURCE_DIR}/main.cpp 
-  #   ${${PROJECT_NAME}_SOURCE_DIR}/mandelbrotwidget.cpp 
-  #   ${${PROJECT_NAME}_SOURCE_DIR}/renderthread.cpp 
-     ${MOC_OUTFILES}
 )
 
 include_directories( ${CMAKE_SOURCE_DIR} )
@@ -36,8 +25,6 @@ add_executable(
 target_link_libraries( 
     ${PROJECT_NAME} 
     ${QT_LIBRARIES} 
- #   ${Boost_LIBRARIES} 
- #   ${OPENGL_LIBRARIES}
 )
 
 

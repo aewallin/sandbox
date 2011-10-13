@@ -1,12 +1,8 @@
-
 #include <QCoreApplication>
 #include <QSemaphore>
 
 #include "producer.hpp"
 #include "consumer.hpp"
-
-
-    
 
 int main(int argc, char *argv[]) {
     

@@ -17,9 +17,9 @@ public:
     void run()  {
         qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
         for (int i = 0; i < ds; ++i) {
-            fb->acquire();
+            fb->acquire(); // aquire free
             buf[i % bs] = "ACGT"[(int)qrand() % 4];
-            ub->release();
+            ub->release(); // release used 
         }
     }
 private:
