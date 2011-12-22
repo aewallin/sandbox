@@ -38,7 +38,8 @@ class edge_iterator : public boost::iterator_facade<
                boost::forward_traversal_tag> 
 {
 public:
-    edge_iterator(): m_edge( 0 ) {}
+    edge_iterator(): m_edge( 0 ) {} // is this constructor ever used? leaves m_g uninitialized!
+    
     explicit edge_iterator(Graph* g, Edge* e): m_edge(e), m_g(g)  {}
 private:
     friend class boost::iterator_core_access;
