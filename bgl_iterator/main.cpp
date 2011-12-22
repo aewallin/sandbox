@@ -29,10 +29,9 @@ typedef boost::adjacency_list< OUT_EDGE,               // out-edge storage
                                > Graph;
 
 typedef boost::graph_traits< Graph >::edge_descriptor      Edge;
-typedef boost::graph_traits< Graph >::edge_iterator        EdgeItr;
 typedef boost::graph_traits< Graph >::vertex_descriptor    Vertex;
 
-
+// see http://www.boost.org/doc/libs/1_48_0/libs/iterator/doc/iterator_facade.htm
 class edge_iterator : public boost::iterator_facade<
                edge_iterator,
                Edge,
@@ -67,6 +66,7 @@ int main(int,char*[]) {
     boost::tie(e3, tmp) = boost::add_edge(v3,v4,g);
     boost::tie(e4, tmp) = boost::add_edge(v4,v1,g);
     
+    // hook up the edges to form a face:
     g[e1].next = e2;
     g[e2].next = e3;
     g[e3].next = e4;
