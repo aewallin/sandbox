@@ -1,4 +1,8 @@
 
+// example for using iterators to traverse the edges of a face in a 
+// planar BGL graph.
+// AW 2011 December
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -38,19 +42,25 @@ class edge_iterator : public boost::iterator_facade<
                boost::forward_traversal_tag> 
 {
 public:
-    edge_iterator(): m_edge( 0 ) {} // is this constructor ever used? leaves m_g uninitialized!
-    
-    explicit edge_iterator(Graph* g, Edge* e): m_edge(e), m_g(g)  {}
-private:
+    explicit edge_iterator(Graph& g, Edge e): m_edge(e), m_g(g), m_inc(false)  {}
+protected:
     friend class boost::iterator_core_access;
-    void increment() { m_edge = &( (*m_g)[*m_edge].next ); } 
+    void increment() { 
+        m_edge = ( m_g[m_edge].next ); 
+        if(!m_inc) m_inc = true;
+    } 
     bool equal( edge_iterator const& other) const {
-        return *(this->m_edge) == *(other.m_edge);
+        return (((m_edge) == (other.m_edge)) && m_inc);
     }
-    Edge& dereference() const { return *m_edge; } 
+    Edge& dereference() const { 
+        Edge cpy(m_edge);
+        Edge&  e = cpy; 
+        return e; 
+    } 
     
-    Edge* m_edge;
-    Graph* m_g;
+    Edge m_edge;
+    Graph& m_g;
+    bool m_inc;
 }; 
 
 int main(int,char*[]) {
@@ -74,6 +84,7 @@ int main(int,char*[]) {
     g[e4].next = e1;
     
     // 1st way to iterate around face of graph
+    // direct traversal of graph
     Edge current=e1;
     Edge start=current;
     std::cout << "1st way:\n";
@@ -87,23 +98,30 @@ int main(int,char*[]) {
     // (1,2)
     // (2,3)
     // (3,0)
-
     
     // 2nd way to iterate around face of graph
-    edge_iterator begin(&g,&e1);
-    // edge_iterator end(&g,&e1); // this gives no output at all!
-    // edge_iterator end(&g,&e2); // this gives (0,1)
-    // edge_iterator end(&g,&e4); // this gives (0,1) (1,2) (2,3)   (but NOT (3,0) !)
-    Edge e1_cpy = e1;
-    edge_iterator end(&g,&e1_cpy); // this gives no output at all!
-    
-    std::pair<edge_iterator,edge_iterator> face_edges(begin,end);
+    // do-while with iterators
+    edge_iterator current_itr(g,e1);
+    edge_iterator end_itr = current_itr;
     std::cout << "2nd way:\n";
-    BOOST_FOREACH(Edge e, face_edges) {
+    do {
+        std::cout << *current_itr++ << "\n";
+    } while (current_itr!=end_itr);
+    // output:
+    // 2nd way:
+    // (0,1)
+    // (1,2)
+    // (2,3)
+    // (3,0)
+    
+    // 3rd way to iterate around face of graph
+    // for_each and iterators
+    edge_iterator begin(g,e1);
+    //edge_iterator end(g,e1);    
+    std::cout << "3rd way:\n";
+    BOOST_FOREACH(Edge e, std::make_pair(begin,begin)) {
         std::cout << e << "\n";
     }
     
-    std::cout << " num_verts= " << boost::num_vertices(g) << std::endl;
-    std::cout << " num_edges= " << boost::num_edges(g) << std::endl;
     return 0;
 }
