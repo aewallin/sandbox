@@ -41,7 +41,6 @@ class edge_iterator : public boost::iterator_facade<
                boost::forward_traversal_tag> 
 {
 public:
-    //typedef typename boost::graph_traits< BGLGraph >::edge_descriptor BGLEdge;
     explicit edge_iterator(Graph& g, Edge e): m_edge(e), m_g(g), m_inc(false)  {}
 protected:
     friend class boost::iterator_core_access;
@@ -60,7 +59,7 @@ protected:
     
     Edge m_edge;
     Graph& m_g;
-    bool m_inc;
+    bool m_inc; // this flag indicates if iterator has been incremented at least once
 }; 
 
 int main(int,char*[]) {
@@ -93,6 +92,7 @@ int main(int,char*[]) {
         current = g[current].next;
     } while (current!=start);
     // output:
+    // Debug/Release
     // 1st way:
     // (0,1)
     // (1,2)
@@ -101,7 +101,6 @@ int main(int,char*[]) {
     
     // 2nd way to iterate around face of graph
     // do-while with iterators
-    //typedef edge_iterator<Graph> eitr;
     
     edge_iterator current_itr(g,e1);
     edge_iterator end_itr = current_itr;
@@ -110,11 +109,12 @@ int main(int,char*[]) {
         std::cout << *current_itr++ << "\n";
     } while (current_itr!=end_itr);
     // output:
-    // 2nd way:
-    // (0,1)
-    // (1,2)
-    // (2,3)
-    // (3,0)
+    // Debug               Release
+    // 2nd way:            2nd way:
+    // (0,1)               (0,1)
+    // (1,2)               (0,1)
+    // (2,3)               (0,1)
+    // (3,0)               (0,1)
     
     // 3rd way to iterate around face of graph
     // for_each and iterators
@@ -124,6 +124,12 @@ int main(int,char*[]) {
     BOOST_FOREACH(Edge e, std::make_pair(begin,end)) {
         std::cout << e << "\n";
     }
-    
+    // output:
+    // Debug               Release
+    // 3rd way:            3rd way:
+    // (0,1)               (0,0)
+    // (1,2)               (0,0)
+    // (2,3)               (0,0)
+    // (3,0)               (0,0)
     return 0;
 }
