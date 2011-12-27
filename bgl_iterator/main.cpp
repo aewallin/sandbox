@@ -32,7 +32,6 @@ typedef boost::adjacency_list< OUT_EDGE,               // out-edge storage
                                boost::listS            // edge storage
                                > Graph;
 
-typedef boost::graph_traits< Graph >::edge_descriptor      Edge;
 typedef boost::graph_traits< Graph >::vertex_descriptor    Vertex;
 
 // see http://www.boost.org/doc/libs/1_48_0/libs/iterator/doc/iterator_facade.htm
@@ -42,13 +41,14 @@ class edge_iterator : public boost::iterator_facade<
                boost::forward_traversal_tag> 
 {
 public:
+    //typedef typename boost::graph_traits< BGLGraph >::edge_descriptor BGLEdge;
     explicit edge_iterator(Graph& g, Edge e): m_edge(e), m_g(g), m_inc(false)  {}
 protected:
     friend class boost::iterator_core_access;
     void increment() { 
         m_edge = ( m_g[m_edge].next ); 
         if(!m_inc) m_inc = true;
-    } 
+    }
     bool equal( edge_iterator const& other) const {
         return (((m_edge) == (other.m_edge)) && m_inc);
     }
@@ -101,6 +101,8 @@ int main(int,char*[]) {
     
     // 2nd way to iterate around face of graph
     // do-while with iterators
+    //typedef edge_iterator<Graph> eitr;
+    
     edge_iterator current_itr(g,e1);
     edge_iterator end_itr = current_itr;
     std::cout << "2nd way:\n";
@@ -117,9 +119,9 @@ int main(int,char*[]) {
     // 3rd way to iterate around face of graph
     // for_each and iterators
     edge_iterator begin(g,e1);
-    //edge_iterator end(g,e1);    
+    edge_iterator end(g,e1);    
     std::cout << "3rd way:\n";
-    BOOST_FOREACH(Edge e, std::make_pair(begin,begin)) {
+    BOOST_FOREACH(Edge e, std::make_pair(begin,end)) {
         std::cout << e << "\n";
     }
     
