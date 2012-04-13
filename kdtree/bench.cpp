@@ -31,6 +31,7 @@ struct Point {
     
     std::vector<double> x;
 };
+
 void format_line(int num_points, int num_tests, double total_time, double time_per_test) {
     std::cout << "| " << std::setw(16) << num_points << " ";
     std::cout << "| " << std::setw(15) << num_tests << " ";
