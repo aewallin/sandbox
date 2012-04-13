@@ -57,7 +57,6 @@ struct kdnode {
 	double *pos;
 	int dir;
 	void *data;
-
 	struct kdnode *left, *right;	/* negative/positive side */
 };
 
