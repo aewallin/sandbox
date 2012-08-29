@@ -4,8 +4,11 @@
 #include <string>
 #include <vector>
 
+#include <fstream> // std::filebuf
+
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/topological_sort.hpp>
+#include <boost/graph/graphviz.hpp>
 
 int main(int,char*[]) {
     using namespace std;
@@ -20,7 +23,7 @@ int main(int,char*[]) {
                                listS            // edge storage
                                > Graph;
                                
-    typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
+    typedef graph_traits<Graph>::vertex_descriptor Vertex;
 
     Graph G(6);
     add_edge( 0,1,G);
@@ -40,6 +43,9 @@ int main(int,char*[]) {
     cout << endl;
     // output:
     // A topological ordering: 2 5 0 1 4 3 
-
+    filebuf fb;
+    fb.open ("test.dot",ios::out);
+    ostream out(&fb);
+    write_graphviz( out, G);
     return 0;
 }

@@ -11,3 +11,8 @@ LINK_DIRECTORIES(${LINK_DIRECTORIES} ${Boost_LIBRARY_DIRS})
 
 
 ADD_EXECUTABLE(bgl_test toposort.cpp)
+
+# target for jpeg image of graph
+add_custom_target(jpg 
+              "dot" -Tjpg test.dot > test.jpg
+            ) 
