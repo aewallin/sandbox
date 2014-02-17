@@ -5,4 +5,4 @@ boost   Boost
 cgal    Computational geometry algorithms library
 libqgl  QGLViewer (wrapper around QGLViewer)
 vtk     Visualization Toolkit
-
+zmq     ZeroMQ
