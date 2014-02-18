@@ -5,7 +5,8 @@
 #include <zmq.hpp>
 #include <string>
 #include <iostream>
-#include <cstdio> // printf
+#include <cstdio> // printf()
+#include <unistd.h> // sleep()
 
 #include "mymessage.pb.h"
 

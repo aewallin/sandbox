@@ -36,7 +36,7 @@ PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS "mymessage.proto")
 #target_link_libraries(mymessage ${PROTOBUF_LIBRARIES}) 
 
 ADD_EXECUTABLE       (zmq_pub  pub.cc ${PROTO_SRCS} ${PROTO_HDRS})
-target_link_libraries(zmq_pub  ${PROTOBUF_LIBRARY} ${ZeroMQ_LIBRARIES} ) 
+target_link_libraries(zmq_pub  ${ZeroMQ_LIBRARIES} -lpthread ${PROTOBUF_LIBRARY}  ) 
 
 
 
