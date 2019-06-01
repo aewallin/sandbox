@@ -1,4 +1,7 @@
+# minimal boost-python example
+# https://github.com/aewallin/sandbox
+
 import testmodule
 
-a = test.MyClass()
+a = testmodule.MyClass()
 a.helloworld()
